@@ -1,43 +1,91 @@
+
 import streamlit as st
 import pandas as pd
 import pickle
-import sklearn
+
+st.set_page_config(page_title="Thyroid Recurrence Predictor")
 
 # Load trained model
 with open("thyroid_pred_model.pkl", "rb") as file:
     model = pickle.load(file)
 
-
-st.set_page_config(page_title="Thyroid Recurrence Predictor")
 st.title("🧠 Thyroid Disease Recurrence Predictor")
-st.markdown("Enter the encoded patient data to predict **recurrent thyroid disease**.")
+st.markdown("Enter the patient data to predict **recurrent thyroid disease**.")
 
-
-# Input fields for all features
 with st.form("Thyroid_Form"):
-    Age = st.number_input("Age (choose between 15 to 85)", min_value=15, max_value=82)
-    Gender = st.selectbox("gender (0 = Female, 1 = Male)", [0, 1])
-    Smoking = st.selectbox("smoking (0 = No, 1 = Yes)", [0, 1])
-    Hx_Smoking = st.selectbox("Hx_Smoking (0 = No, 1 = Yes)", [0, 1])
-    Hx_Radiothreapy = st.selectbox("Hx_Radiothreapy (0 = No, 1 = Yes)", [0, 1])
-    Thyroid_Function = st.selectbox("Thyroid_Function (0 = Clinical Hyperthyrodism, 1 = Clinical Hypothyrodism ,"
-                                    " 2 = Euthyroid, 3 = Subclinical Hyperthyrodism, 4 = Subclinical Hypothyrodism) ",
-                                    [0, 1, 2, 3, 4])
-    Physical_Examination = st.selectbox("Physical_Examination (0 = Diffuse goiter, 1 = Multinodular goiter,  "
-                                        "2 = Normal, 3 = Single nodular goiter-left, 4 = Single nodular goiter-right)",
-                                        [0, 1, 2, 3, 4])
-    Pathology = st.selectbox("pathology (0 = Follicular, 1 = Hurthel cell, 2 = Micropapillary, 3 = Papillary)",
-                             [0, 1, 2, 3])
-    Adenopathy = st.selectbox("adenopathy (0 = Bilateral, 1 = Extensive, 2 = Left, 3 = No, 4 = Posterior,  5 = Right)",
-                              [0, 1, 2, 3, 4, 5])
-    Focality = st.selectbox("focality (0 = Multi-Focal, 1 = Uni-Focal )", [0, 1])
-    T_Stage = st.selectbox("T_stage (0 = T1a, 1 = T1b, 2 = T2, 3 = T3a, 4 = T3b, 5 = T4a, 6 = T4b)", [0, 1, 2, 3, 4, 5, 6])
-    N_Stage = st.selectbox("N_stage (0 = N0, 1 = N1a, 2 = N1b )", [0, 1, 2])
-    M_Stage = st.selectbox("M_stage (0 = M0, 1 = M1)", [0, 1])
-    Stage = st.selectbox("stage (0 = I, 2 = IVA, 3 = III, 4 = IVB, 5 = II)", [0, 1, 2, 3, 4])
-    Response = st.selectbox("response (0 = Biochemical Incomplete, 1 = Excellent, 2 = Indeterminate,"
-                            "  3 = Structural Incomplete)", [0, 1, 2, 3])
-    Risk = st.selectbox("risk (0 = High, 1 = Intermediate, 2 = Low)", [0, 1, 2])
+    Age = st.number_input("Age", min_value=15, max_value=82)
+
+    gender_map = {"Female": 0, "Male": 1}
+    Gender = gender_map[st.selectbox("Gender", list(gender_map.keys()))]
+
+    smoking_map = {"No": 0, "Yes": 1}
+    Smoking = smoking_map[st.selectbox("Smoking", list(smoking_map.keys()))]
+
+    Hx_Smoking = smoking_map[st.selectbox("History of Smoking", list(smoking_map.keys()))]
+
+    Hx_Radiothreapy = smoking_map[st.selectbox("History of Radiotherapy", list(smoking_map.keys()))]
+
+    thyroid_map = {
+        "Clinical Hyperthyroidism": 0,
+        "Clinical Hypothyroidism": 1,
+        "Euthyroid": 2,
+        "Subclinical Hyperthyroidism": 3,
+        "Subclinical Hypothyroidism": 4
+    }
+    Thyroid_Function = thyroid_map[st.selectbox("Thyroid Function", list(thyroid_map.keys()))]
+
+    physical_map = {
+        "Diffuse Goiter": 0,
+        "Multinodular Goiter": 1,
+        "Normal": 2,
+        "Single Nodular Goiter - Left": 3,
+        "Single Nodular Goiter - Right": 4
+    }
+    Physical_Examination = physical_map[st.selectbox("Physical Examination", list(physical_map.keys()))]
+
+    pathology_map = {
+        "Follicular": 0,
+        "Hurthle Cell": 1,
+        "Micropapillary": 2,
+        "Papillary": 3
+    }
+    Pathology = pathology_map[st.selectbox("Pathology", list(pathology_map.keys()))]
+
+    adenopathy_map = {
+        "Bilateral": 0,
+        "Extensive": 1,
+        "Left": 2,
+        "No": 3,
+        "Posterior": 4,
+        "Right": 5
+    }
+    Adenopathy = adenopathy_map[st.selectbox("Adenopathy", list(adenopathy_map.keys()))]
+
+    focality_map = {"Multi-Focal": 0, "Uni-Focal": 1}
+    Focality = focality_map[st.selectbox("Focality", list(focality_map.keys()))]
+
+    t_stage_map = {"T1a": 0, "T1b": 1, "T2": 2, "T3a": 3, "T3b": 4, "T4a": 5, "T4b": 6}
+    T_Stage = t_stage_map[st.selectbox("T Stage", list(t_stage_map.keys()))]
+
+    n_stage_map = {"N0": 0, "N1a": 1, "N1b": 2}
+    N_Stage = n_stage_map[st.selectbox("N Stage", list(n_stage_map.keys()))]
+
+    m_stage_map = {"M0": 0, "M1": 1}
+    M_Stage = m_stage_map[st.selectbox("M Stage", list(m_stage_map.keys()))]
+
+    stage_map = {"I": 0, "II": 1, "III": 2, "IVA": 3, "IVB": 4}
+    Stage = stage_map[st.selectbox("Stage", list(stage_map.keys()))]
+
+    response_map = {
+        "Biochemical Incomplete": 0,
+        "Excellent": 1,
+        "Indeterminate": 2,
+        "Structural Incomplete": 3
+    }
+    Response = response_map[st.selectbox("Response", list(response_map.keys()))]
+
+    risk_map = {"High": 0, "Intermediate": 1, "Low": 2}
+    Risk = risk_map[st.selectbox("Risk", list(risk_map.keys()))]
 
     submitted = st.form_submit_button("Predict")
 
@@ -63,12 +111,9 @@ if submitted:
     }
 
     input_df = pd.DataFrame(input_data)
-
     prediction = model.predict(input_df)[0]
 
     if prediction == 1:
         st.error("🚨 The patient is likely to experience a recurrence of thyroid disease.")
     else:
         st.success("✅ The patient is NOT likely to have a recurrence.")
-
-
