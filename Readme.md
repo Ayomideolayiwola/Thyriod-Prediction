@@ -56,3 +56,6 @@ Always consult a qualified healthcare provider for medical decisions.
 - Email: olaayomide222@gmail.com
 - App:https://thyriod-prediction-model.streamlit.app/
 
+
+
+![Project Banner](images/diabetics.png)
